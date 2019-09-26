@@ -1,5 +1,18 @@
 "use strict";
 
+const form = document.querySelector("form");
+
+form.addEventListener("submit", evt => {
+  evt.preventDefault();
+  const inputData = {
+    bandname: form.elements.bandname.value,
+    musicgenre: form.elements.genre.value,
+    nrofmembers: form.elements.nrofmembers.value,
+    songtitle: form.elements.song.value
+  };
+  post(inputData);
+});
+
 function get() {
   fetch("https://bandsdatabase-76bc.restdb.io/rest/bands", {
     method: "get",
@@ -33,15 +46,9 @@ function addBandToDOM(band) {
   document.querySelector(".app").prepend(clone);
 }
 
-function post() {
-  const data = {
-    bandname: "Designer",
-    musicgenre: "CSS, JS",
-    nrofmembers: 404,
-    songtitle: "Why doesn't it work\nLalal"
-  };
-  addBandToDOM(data);
-  const postData = JSON.stringify(data);
+function post(inputData) {
+  addBandToDOM(inputData);
+  const postData = JSON.stringify(inputData);
   fetch("https://bandsdatabase-76bc.restdb.io/rest/bands", {
     method: "post",
     headers: {
@@ -57,9 +64,9 @@ function post() {
     });
 }
 
-document.querySelector(".add").addEventListener("click", e => {
-  post();
-});
+// document.querySelector(".add").addEventListener("click", e => {
+//   post();
+// });
 
 function deleteBand(id) {
   fetch("https://bandsdatabase-76bc.restdb.io/rest/bands/" + id, {
