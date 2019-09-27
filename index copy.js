@@ -1,37 +1,10 @@
 "use strict";
 
 const form = document.querySelector("form#addform");
-const formEdit = document.querySelector("form#editform");
 form.setAttribute("novalidate", true);
-
-// CHECKING VALIDITY
-// function checkValidity() {
-//   if (form.elements.bandname.checkValidity()) {
-//     form.elements.bandname.style.background = "";
-//   } else {
-//     form.elements.bandname.style.background = "red";
-//   }
-// }
-
-// form.elements.bandname.addEventListener("blur", checkValidity);
-// form.elements.bandname.addEventListener("focus", () => {
-//   form.elements.bandname.style.background = "";
-// });
 
 form.addEventListener("submit", evt => {
   evt.preventDefault();
-
-  // if (form.reportValidity()) {
-  //   const inputData = {
-  //     bandname: form.elements.bandname.value,
-  //     musicgenre: form.elements.genre.value,
-  //     nrofmembers: form.elements.nrofmembers.value,
-  //     songtitle: form.elements.song.value
-  //   };
-  //   post(inputData);
-  // } else {
-  //   alert("sth is wrong");
-  // }
 
   const inputData = {
     bandname: form.elements.bandname.value,
@@ -40,11 +13,6 @@ form.addEventListener("submit", evt => {
     songtitle: form.elements.song.value
   };
   post(inputData);
-});
-
-formEdit.addEventListener("submit", evt => {
-  evt.preventDefault();
-  put();
 });
 
 function get() {
@@ -67,20 +35,43 @@ get();
 function addBandToDOM(band) {
   const template = document.querySelector("template").content;
   const clone = template.cloneNode(true);
+  const formEdit = clone.querySelector("form#editform");
   clone.querySelector("article").dataset.bandid = band._id;
+  clone.querySelector(".flip-card").dataset.bandid = band._id;
+  formEdit.dataset.bandid = band._id;
   clone.querySelector("h1").textContent = band.bandname;
   clone.querySelector("h2").textContent = band.musicgenre;
   clone.querySelector("h3").textContent = band.nrofmembers;
   clone.querySelector("p").textContent = band.songtitle;
 
+  formEdit.addEventListener("submit", evt => {
+    evt.preventDefault();
+    put(band._id);
+  });
+
   clone.querySelector(".delete").addEventListener("click", () => {
     deleteBand(band._id);
   });
+
   clone.querySelector(".edit").addEventListener("click", () => {
-    editBand(band._id);
+    clickedDetails(band._id);
+  });
+  clone.querySelector(".cancel").addEventListener("click", () => {
+    cancelDetails(band._id);
   });
 
   document.querySelector(".app").prepend(clone);
+}
+
+function clickedDetails(id) {
+  const clickedBand = document.querySelector(`.flip-card[data-bandid="${id}"`);
+  clickedBand.classList.add("clicked");
+  editBand(id);
+}
+
+function cancelDetails(id) {
+  const clickedBand = document.querySelector(`.flip-card[data-bandid="${id}"`);
+  clickedBand.classList.remove("clicked");
 }
 
 function post(inputData) {
@@ -96,12 +87,16 @@ function post(inputData) {
     body: postData
   })
     .then(res => res.json())
-    .then(data => {
-      console.log(data);
+    .then(() => {
+      form.elements.bandname.value = "";
+      form.elements.genre.value = "";
+      form.elements.nrofmembers.value = "";
+      form.elements.song.value = "";
     });
 }
 
-function put() {
+function put(id) {
+  const formEdit = document.querySelector(`#editform[data-bandid="${id}"`);
   const data = {
     bandname: formEdit.elements.bandname.value,
     genre: formEdit.elements.genre.value,
@@ -131,12 +126,12 @@ function put() {
       parentElement.querySelector("h2").textContent = updatedBand.genre;
       parentElement.querySelector("h3").textContent = updatedBand.nrofmembers;
       parentElement.querySelector("p").textContent = updatedBand.song;
-
       formEdit.elements.bandname.value = "";
       formEdit.elements.genre.value = "";
       formEdit.elements.nrofmembers.value = "";
       formEdit.elements.song.value = "";
       formEdit.elements.id.value = "";
+      cancelDetails(updatedBand._id);
     });
 }
 
@@ -152,7 +147,7 @@ function deleteBand(id) {
     .then(res => res.json())
     .then(data => {
       //delete from DOM
-      document.querySelector(`article[data-bandid="${id}"`).remove();
+      document.querySelector(`.flip-card[data-bandid="${id}"`).remove();
     });
 }
 
@@ -167,6 +162,7 @@ function editBand(id) {
   })
     .then(e => e.json())
     .then(bands => {
+      const formEdit = document.querySelector(`#editform[data-bandid="${id}"`);
       formEdit.elements.bandname.value = bands.bandname;
       formEdit.elements.genre.value = bands.genre;
       formEdit.elements.nrofmembers.value = bands.nrofmembers;

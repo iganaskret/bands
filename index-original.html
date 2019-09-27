@@ -8,7 +8,7 @@
     <title>Document</title>
   </head>
   <body>
-    <form>
+    <form id="addform">
       <label for="bandname">
         Band name
         <input type="text" name="bandname" id="bandname" required />
@@ -37,6 +37,38 @@
 
       <input type="submit" name="submit" class="add" value="Add band" />
     </form>
+
+    <form id="editform">
+      <label for="bandname">
+        Band name
+        <input type="text" name="bandname" id="bandname" required />
+      </label>
+
+      <label for="genre">Music genre</label>
+      <input list="genres" id="genre" name="genre" />
+      <datalist id="genres">
+        <option value="Rock"> </option>
+        <option value="Punk"> </option>
+        <option value="Hip Hop"> </option>
+        <option value="Heavy metal"> </option>
+        <option value="Indie"> </option>
+        <option value="Alternative"> </option>
+        <option value="Classical music"> </option>
+      </datalist>
+
+      <label for="nr-of-members">
+        Number of members
+        <input type="number" name="nrofmembers" id="nr-of-members" />
+      </label>
+      <label for="song">
+        Song title
+        <input type="text" name="song" id="song" />
+      </label>
+
+      <input type="hidden" name="id" />
+
+      <input type="submit" name="submit" class="add" value="Edit band" />
+    </form>
     <div class="app"></div>
     <template>
       <article>
@@ -44,6 +76,7 @@
         <h2></h2>
         <h3></h3>
         <p></p>
+        <button class="edit">edit me</button>
         <button class="delete">delete me</button>
       </article>
     </template>
